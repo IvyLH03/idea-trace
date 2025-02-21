@@ -3,7 +3,22 @@ import sqlite3 from 'sqlite3';
 import { open } from 'sqlite'
 
 const app = express()
-const port = 6000
+const port = 5500
+
+// CORS
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", req.headers.origin);
+    if (req.headers["access-control-request-headers"]) {
+        res.header("Access-Control-Allow-Headers", req.headers["access-control-request-headers"]);
+    }
+    if (req.headers["access-control-request-method"]) {
+        res.header('Access-Control-Allow-Methods', req.headers["access-control-request-method"]);
+    }
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Expose-Headers', 'Set-Cookie');
+    res.header('Vary', 'Origin, Access-Control-Allow-Headers, Access-Control-Allow-Methods')
+    next();
+});
 
 app.use(express.json())
 
