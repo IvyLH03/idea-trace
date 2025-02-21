@@ -14,6 +14,10 @@ const db = await open({
 
 const INSERT_THOUGHT_SQL = "INSERT INTO thought(content, created_at) VALUES (?, ?) RETURNING thought_id"
 const GET_THOUGHT_ALL_SQL = "SELECT * FROM thought"
+const GET_MOST_RECENT_THOUGHT = "SELECT * " +
+  "FROM thought " +
+  "ORDER BY created_at DESC " +
+  "LIMIT 1"
 
 
 await db.exec("CREATE TABLE IF NOT EXISTS thought("+
@@ -22,7 +26,7 @@ await db.exec("CREATE TABLE IF NOT EXISTS thought("+
   "created_at INTEGER NOT NULL" + 
   ");")
 
-app.get('/get_all_thoughts', async (req, res) =>{
+app.get('/thought/get/all', async (req, res) =>{
   try{
     const result = await db.all(GET_THOUGHT_ALL_SQL)
     res.status(200).send(result)
@@ -32,7 +36,17 @@ app.get('/get_all_thoughts', async (req, res) =>{
   }
 })
 
-app.post('/post_thought', async (req, res) => {
+app.get('/thought/get/recent', async (req, res) =>{
+  try{
+    const result = await db.get(GET_MOST_RECENT_THOUGHT)
+    res.status(200).send(result)
+  } catch(e) {
+    console.error(e)
+    res.status(500).send({msg:"server error"})
+  }
+})
+
+app.post('/thought/post', async (req, res) => {
   try{
     const created_at = Math.floor(Date.now() / 1000)
     console.log(req.body.content)
