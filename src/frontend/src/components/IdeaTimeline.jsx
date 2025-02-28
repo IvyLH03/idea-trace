@@ -5,6 +5,8 @@ import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 import TimelineDot from '@mui/lab/TimelineDot';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function IdeaTimelineItem ({thought}) {
   const created_at = new Date(thought.created_at*1000)
@@ -16,12 +18,17 @@ function IdeaTimelineItem ({thought}) {
             hour:"numeric", 
             minute: "numeric",})
           }
+          <IconButton aria-label="delete" onClick={()=>{}}>
+            <DeleteIcon />
+          </IconButton>
         </TimelineOppositeContent>
         <TimelineSeparator>
           <TimelineDot />
           <TimelineConnector />
         </TimelineSeparator>
-        <TimelineContent>{thought.content}</TimelineContent>
+        <TimelineContent>
+          {thought.content}
+        </TimelineContent>
       </TimelineItem>
   )
 }
