@@ -4,8 +4,9 @@ import Stack from "@mui/material/Stack";
 
 import Button from "@mui/material/Button";
 import { useState } from "react";
+import { postThought } from "../scripts/api";
 
-export default function CreateThought({postThought}) {
+export default function CreateThought({refreshData}) {
   const [thoughtContent, setThoughtContent] = useState("")
   return (
     <Stack
@@ -22,7 +23,12 @@ export default function CreateThought({postThought}) {
         onChange= {event => {
           setThoughtContent(event.target.value);
         }}/>
-      <Button variant="outlined" onClick={() => {postThought(thoughtContent)}}>Log</Button>
+      <Button variant="outlined" onClick={() => {
+        postThought(thoughtContent)
+        .then(()=>{
+          refreshData()
+        })
+      }}>Log</Button>
     </Stack>
   )
 }

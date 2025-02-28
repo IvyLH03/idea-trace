@@ -7,8 +7,9 @@ import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 import TimelineDot from '@mui/lab/TimelineDot';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { deleteThought } from '../scripts/api';
 
-function IdeaTimelineItem ({thought}) {
+function IdeaTimelineItem ({thought, refreshData}) {
   const created_at = new Date(thought.created_at*1000)
   return (
       <TimelineItem>
@@ -18,7 +19,10 @@ function IdeaTimelineItem ({thought}) {
             hour:"numeric", 
             minute: "numeric",})
           }
-          <IconButton aria-label="delete" onClick={()=>{}}>
+          <IconButton aria-label="delete" onClick={()=>{
+            deleteThought(thought.thought_id)
+            .then(() => {refreshData()})
+          }}>
             <DeleteIcon />
           </IconButton>
         </TimelineOppositeContent>
@@ -33,10 +37,10 @@ function IdeaTimelineItem ({thought}) {
   )
 }
 
-export default function BasicTimeline({thoughts}) {
+export default function BasicTimeline({thoughts, refreshData}) {
   return (
     <Timeline>
-      {thoughts.map(e => <IdeaTimelineItem thought={e} key={e.thought_id}/>)}
+      {thoughts.map(e => <IdeaTimelineItem thought={e} key={e.thought_id} refreshData={refreshData}/>)}
     </Timeline>
   );
 }

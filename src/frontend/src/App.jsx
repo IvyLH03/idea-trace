@@ -6,48 +6,26 @@ import './App.css'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 import CreateThought from './components/CreateThought'
+import {getAllThoughts} from './scripts/api'
 
 function App() {
   const [thoughts, setThoughts] = useState([])
-  // const base_url = "http://localhost:5500"
-  const base_url = "https://trace.ivylh03.net"
 
-
-  function getAllThoughts () {
-    fetch(base_url + '/thought/get/all')
-    .then(res => res.json())
+  const refreshData = () => {
+    getAllThoughts()
     .then(data => {
-      console.log(data)
       setThoughts(data)
     })
   }
 
   useEffect(() => {
-    getAllThoughts()
+    refreshData()
   }, [])
-
-  const postThought = (content) => {
-    fetch(base_url + '/thought/post', {
-      method: "POST",
-      headers:{
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        content: content
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      console.log(data)
-      getAllThoughts()
-    })
-
-  }
 
   return (
     <Container>
-      <IdeaTimeline thoughts={thoughts}/>
-      <CreateThought postThought={postThought}/>
+      <IdeaTimeline thoughts={thoughts} refreshData={refreshData}/>
+      <CreateThought refreshData={refreshData}/>
     </Container>
   )
 }
