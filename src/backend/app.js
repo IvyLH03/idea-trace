@@ -33,7 +33,9 @@ const GET_MOST_RECENT_THOUGHT = "SELECT * " +
   "FROM thought " +
   "ORDER BY created_at DESC " +
   "LIMIT 1"
-
+const DELETE_THOUGHT_SQL = "DELETE " +
+  "FROM thought " +
+  "WHERE thought_id = (?)"
 
 await db.exec("CREATE TABLE IF NOT EXISTS thought("+
   "thought_id INTEGER PRIMARY KEY UNIQUE, " +
@@ -41,6 +43,9 @@ await db.exec("CREATE TABLE IF NOT EXISTS thought("+
   "created_at INTEGER NOT NULL" + 
   ");")
 
+/**
+ * get all thoughts
+ */
 app.get('/thought/get/all', async (req, res) =>{
   try{
     const result = await db.all(GET_THOUGHT_ALL_SQL)
@@ -51,6 +56,9 @@ app.get('/thought/get/all', async (req, res) =>{
   }
 })
 
+/**
+ * get the most recent thought
+ */
 app.get('/thought/get/recent', async (req, res) =>{
   try{
     const result = await db.get(GET_MOST_RECENT_THOUGHT)
@@ -61,6 +69,9 @@ app.get('/thought/get/recent', async (req, res) =>{
   }
 })
 
+/**
+ * post a thought
+ */
 app.post('/thought/post', async (req, res) => {
   try{
     const created_at = Math.floor(Date.now() / 1000)
@@ -73,6 +84,17 @@ app.post('/thought/post', async (req, res) => {
   }
 })
 
+/**
+ * delete a thought
+ */
+app.delete('/thought/:thoughtId', async (req, res) => {
+  const thoughtId = req.params.thoughtId
+  const result = await db.get(DELETE_THOUGHT_SQL, thoughtId)
+  res.status(200).send(result)
+
+})
+
 app.listen(port, () => {
   console.log(`app listening on port ${port}`)
+  
 })
