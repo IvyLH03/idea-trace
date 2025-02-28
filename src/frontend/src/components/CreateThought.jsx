@@ -27,6 +27,7 @@ export default function CreateThought({refreshData}) {
         postThought(thoughtContent)
         .then(()=>{
           refreshData()
+          setThoughtContent("")
         })
       }}>Log</Button>
     </Stack>
