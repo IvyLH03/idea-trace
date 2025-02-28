@@ -9,9 +9,12 @@ import CreateThought from './components/CreateThought'
 
 function App() {
   const [thoughts, setThoughts] = useState([])
+  // const base_url = "http://localhost:5500"
+  const base_url = "https://trace.ivylh03.net"
+
 
   function getAllThoughts () {
-    fetch('http://localhost:5500/thought/get/all')
+    fetch(base_url + '/thought/get/all')
     .then(res => res.json())
     .then(data => {
       console.log(data)
@@ -24,7 +27,7 @@ function App() {
   }, [])
 
   const postThought = (content) => {
-    fetch('http://localhost:5500/thought/post', {
+    fetch(base_url + '/thought/post', {
       method: "POST",
       headers:{
         "Content-Type": "application/json"
