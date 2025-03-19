@@ -22,10 +22,23 @@ app.use((req, res, next) => {
 
 app.use(express.json())
 
-const db = await open({
-  filename: "./db.db",
+/* ================================== */
+
+/**
+ * THOUGHT
+ */
+
+// open & initialize database
+const thought_db = await open({
+  filename: "./thought.db",
   driver: sqlite3.Database
 });
+
+await thought_db.exec("CREATE TABLE IF NOT EXISTS thought("+
+  "thought_id INTEGER PRIMARY KEY UNIQUE, " +
+  "content TEXT NOT NULL, " +
+  "created_at INTEGER NOT NULL" + 
+  ");")
 
 const INSERT_THOUGHT_SQL = "INSERT INTO thought(content, created_at) VALUES (?, ?) RETURNING thought_id"
 const GET_THOUGHT_ALL_SQL = "SELECT * FROM thought"
@@ -37,18 +50,15 @@ const DELETE_THOUGHT_SQL = "DELETE " +
   "FROM thought " +
   "WHERE thought_id = (?)"
 
-await db.exec("CREATE TABLE IF NOT EXISTS thought("+
-  "thought_id INTEGER PRIMARY KEY UNIQUE, " +
-  "content TEXT NOT NULL, " +
-  "created_at INTEGER NOT NULL" + 
-  ");")
+
+
 
 /**
  * get all thoughts
  */
 app.get('/thought/get/all', async (req, res) =>{
   try{
-    const result = await db.all(GET_THOUGHT_ALL_SQL)
+    const result = await thought_db.all(GET_THOUGHT_ALL_SQL)
     res.status(200).send(result)
   } catch(e) {
     console.error(e)
@@ -61,7 +71,7 @@ app.get('/thought/get/all', async (req, res) =>{
  */
 app.get('/thought/get/recent', async (req, res) =>{
   try{
-    const result = await db.get(GET_MOST_RECENT_THOUGHT)
+    const result = await thought_db.get(GET_MOST_RECENT_THOUGHT)
     res.status(200).send(result)
   } catch(e) {
     console.error(e)
@@ -74,9 +84,15 @@ app.get('/thought/get/recent', async (req, res) =>{
  */
 app.post('/thought/post', async (req, res) => {
   try{
+    // check password
+    if (req.body.upload_password !== process.env.UPLOAD_PASSWORD) {
+      res.status(401).send({msg:"unauthorized"})
+      return
+    }
+
     const created_at = Math.floor(Date.now() / 1000)
     console.log(req.body.content)
-    const result = await db.get(INSERT_THOUGHT_SQL, req.body.content, created_at)
+    const result = await thought_db.get(INSERT_THOUGHT_SQL, req.body.content, created_at)
     res.status(200).send(result)
   } catch(e) {
     console.error(e)
@@ -88,8 +104,14 @@ app.post('/thought/post', async (req, res) => {
  * delete a thought
  */
 app.delete('/thought/:thoughtId', async (req, res) => {
+  // check password
+  if (req.body.upload_password !== process.env.UPLOAD_PASSWORD) {
+    res.status(401).send({msg:"unauthorized"})
+    return
+  }
+  
   const thoughtId = req.params.thoughtId
-  const result = await db.get(DELETE_THOUGHT_SQL, thoughtId)
+  const result = await thought_db.get(DELETE_THOUGHT_SQL, thoughtId)
   res.status(200).send(result)
 
 })
